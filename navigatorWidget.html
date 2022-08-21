@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	</head>
+	<body>
+		<script type="text/javascript">
+			var timeInterval = null;
+
+			var startLongitude = null;
+			var startLatitude = null;
+
+			var isInitial = true; // to store initial coordinates
+
+			function success({coords, timestamps}) {
+				if(!coords){
+					window.parent.postMessage(
+					{
+						msg: "coords가 없습니다",
+					},
+					"*"
+					);
+				} else if (coords) {
+            		const longitude = (coords.longitude*1000)%1000; // 경도
+					const latitude = (coords.latitude*1000)%1000;   // 위도
+					
+					window.parent.postMessage(
+					{
+						longitude: longitude,
+						latitude: latitude,
+					},
+					"*"
+					);
+				}
+        	}
+
+			function error(err) {
+				console.log(err);
+				window.parent.postMessage(
+					{
+						msg: err,
+					},
+					"*"
+				);
+			}
+
+        	function getUserLocation() {
+				if (!navigator){
+					window.parent.postMessage(
+					{
+						msg: "navigator가 없습니다",
+					},
+					"*"
+					);
+				}
+            	else if (!navigator.geolocation) {
+                	window.parent.postMessage(
+					{
+						msg: "위치 정보가 지원되지 않습니다",
+					},
+					"*"
+					);
+            	} else {
+					navigator.geolocation.getCurrentPosition(success, error);
+				}
+        	}
+
+			// getUserLocation();
+			timeInterval = setInterval(getUserLocation, 5000);
+
+		</script>
+	</body>
+</html>
